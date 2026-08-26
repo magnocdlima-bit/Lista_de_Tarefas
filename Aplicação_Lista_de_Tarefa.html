@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas</title>
+
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 space-y-6">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/30">
+                    <i class="ph-bold ph-list-checks text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-wide">Minhas Tarefas</h1>
+                    <p class="text-xs text-slate-400">Organize seu dia com facilidade</p>
+                </div>
+            </div>
+            <span id="taskCounter" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300">
+                0 tarefas
+            </span>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-2">
+            <div class="relative flex-1">
+                <input placeholder="Digite uma nova tarefa..." type="text" id="tarefa"
+                    class="w-full bg-slate-900/60 border border-slate-700 focus:border-indigo-500 text-slate-100 placeholder-slate-500 text-sm rounded-xl py-3 px-4 outline-none transition-all duration-200" />
+            </div>
+
+            <!-- Botão de Criar -->
+            <button id="criar" 
+                class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white p-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-indigo-600/25 cursor-pointer">
+                <i class="ph-bold ph-plus text-lg"></i>
+            </button>
+
+            <!-- Botão de Salvar Edição -->
+            <button id="confirmEdit" hidden 
+                class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white p-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-amber-600/25 cursor-pointer">
+                <i class="ph-bold ph-check text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Lista de Tarefas -->
+        <div id="listaDeDados" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+            <!-- As tarefas serão inseridas aqui dinamicamente -->
+        </div>
+
+    </div>
+
+    <script>
+        let tarefas = [];
+        let idEditando = null;
+
+        document.getElementById("criar").addEventListener("click", criarTarefa);
+        document.getElementById("confirmEdit").addEventListener("click", salvarEdicao);
+        
+        // Permite adicionar com a tecla Enter
+        document.getElementById("tarefa").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                if (idEditando !== null) {
+                    salvarEdicao();
+                } else {
+                    criarTarefa();
+                }
+            }
+        });
+
+        function criarTarefa() {
+            const input = document.getElementById("tarefa");
+            const texto = input.value.trim();
+
+            if (texto === "") {
+                alert("Digite a descrição da tarefa!");
+                return;
+            }
+
+            const idTarefa = Date.now(); // ID único baseado em timestamp
+            tarefas.push([idTarefa, texto, false]); // [id, texto, concluida]
+
+            mostrarLista();
+            input.value = "";
+        }
+
+        function mostrarLista() {
+            const listaDeDados = document.getElementById("listaDeDados");
+            const taskCounter = document.getElementById("taskCounter");
+            
+            listaDeDados.innerHTML = "";
+            taskCounter.textContent = `${tarefas.length} ${tarefas.length === 1 ? 'tarefa' : 'tarefas'}`;
+
+            if (tarefas.length === 0) {
+                listaDeDados.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 space-y-2">
+                        <i class="ph-bold ph-tray text-4xl opacity-50"></i>
+                        <p class="text-sm">Nenhuma tarefa encontrada.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            tarefas.forEach(function (tarefa) {
+                const [id, texto, concluida] = tarefa;
+                
+                const card = document.createElement("div");
+                card.className = `flex justify-between items-center p-3.5 rounded-xl border transition-all duration-200 ${
+                    concluida 
+                        ? 'bg-slate-900/40 border-slate-800 opacity-60' 
+                        : 'bg-slate-700/40 border-slate-700/60 hover:border-slate-600'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden mr-2">
+                        <button onclick="updateStatus(${id})" class="cursor-pointer text-lg ${concluida ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}">
+                            <i class="ph-bold ${concluida ? 'ph-check-circle' : 'ph-circle'}"></i>
+                        </button>
+                        <span class="text-sm font-medium ${concluida ? 'line-through text-slate-500' : 'text-slate-200'} truncate">
+                            ${texto}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="iniciarEdicao(${id})" class="p-2 text-slate-400 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+                            <i class="ph-bold ph-pencil-simple text-base"></i>
+                        </button>
+                        <button onclick="deleteTarefa(${id})" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+                            <i class="ph-bold ph-trash text-base"></i>
+                        </button>
+                    </div>
+                `;
+
+                listaDeDados.appendChild(card);
+            });
+        }
+
+        function updateStatus(id) {
+            const index = tarefas.findIndex(t => t[0] === id);
+            if (index !== -1) {
+                tarefas[index][2] = !tarefas[index][2];
+                mostrarLista();
+            }
+        }
+
+        function iniciarEdicao(id) {
+            const tarefa = tarefas.find(t => t[0] === id);
+            if (!tarefa) return;
+
+            idEditando = id;
+            document.getElementById("tarefa").value = tarefa[1];
+            document.getElementById("tarefa").focus();
+            
+            document.getElementById("criar").setAttribute("hidden", "true");
+            document.getElementById("confirmEdit").removeAttribute("hidden");
+        }
+
+        function salvarEdicao() {
+            const input = document.getElementById("tarefa");
+            const texto = input.value.trim();
+
+            if (texto === "") {
+                alert("Digite a tarefa!");
+                return;
+            }
+
+            const index = tarefas.findIndex(t => t[0] === idEditando);
+            if (index !== -1) {
+                tarefas[index][1] = texto;
+            }
+
+            // Restaura o estado inicial do formulário
+            idEditando = null;
+            input.value = "";
+            document.getElementById("confirmEdit").setAttribute("hidden", "true");
+            document.getElementById("criar").removeAttribute("hidden");
+            
+            mostrarLista();
+        }
+
+        function deleteTarefa(id) {
+            tarefas = tarefas.filter(t => t[0] !== id);
+            
+            // Se estiver editando a tarefa que foi apagada, cancela a edição
+            if (idEditando === id) {
+                idEditando = null;
+                document.getElementById("tarefa").value = "";
+                document.getElementById("confirmEdit").setAttribute("hidden", "true");
+                document.getElementById("criar").removeAttribute("hidden");
+            }
+
+            mostrarLista();
+        }
+
+        // Renderização inicial
+        mostrarLista();
+    </script>
+
+</body>
+
+</html>
