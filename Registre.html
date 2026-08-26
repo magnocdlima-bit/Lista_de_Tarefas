@@ -5,14 +5,15 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Registro | Lista de Tarefas</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
 
 </head>
 
@@ -49,30 +50,24 @@
 
         <!-- Card -->
 
-        <section
-            class="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-8"
-        >
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-8">
 
 
-            <form>
+            <form id="formRegistro">
 
 
                 <!-- Nome -->
 
                 <div class="mb-5">
 
-                    <label
-                        class="block text-sm font-medium text-gray-300 mb-2"
-                    >
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
                         Nome
                     </label>
 
 
-                    <input
-                        type="text"
-                        placeholder="Digite seu nome"
+                    <input id="nome" type="text" placeholder="Digite seu nome"
                         class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                        required>
 
                 </div>
 
@@ -82,18 +77,14 @@
 
                 <div class="mb-5">
 
-                    <label
-                        class="block text-sm font-medium text-gray-300 mb-2"
-                    >
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
                         E-mail
                     </label>
 
 
-                    <input
-                        type="email"
-                        placeholder="seuemail@email.com"
+                    <input id="email" type="email" placeholder="seuemail@email.com"
                         class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                        required>
 
                 </div>
 
@@ -103,33 +94,29 @@
 
                 <div class="mb-6">
 
-                    <label
-                        class="block text-sm font-medium text-gray-300 mb-2"
-                    >
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
                         Senha
                     </label>
 
 
-                    <input
-                        type="password"
-                        placeholder="Crie uma senha"
+                    <input id="senha" type="password" placeholder="Crie uma senha"
                         class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                      
                     >
 
                 </div>
 
 
 
-                <!-- Botão -->
+                !-- Botão
 
                 <button
-                    type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300"
-                >
+                    type=" submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300">
 
                     Criar conta
 
-                </button>
+                    </button>
 
 
             </form>
@@ -145,10 +132,7 @@
                     Já possui uma conta?
 
 
-                    <a
-                        href="login.html"
-                        class="text-blue-500 hover:text-blue-400 font-medium"
-                    >
+                    <a href="login.html" class="text-blue-500 hover:text-blue-400 font-medium">
 
                         Fazer login
 
@@ -168,3 +152,53 @@
 </body>
 
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script>
+
+const formRegistro = document.getElementById("formRegistro");
+
+formRegistro.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const nome = document.getElementById("nome").value;
+
+    const email = document.getElementById("email").value;
+
+    const senha = document.getElementById("senha").value;
+
+
+    const { data, error } = await supabaseClient.auth.signUp({
+
+        email: email,
+
+        password: senha,
+
+        options: {
+            data: {
+                nome: nome
+            }
+        }
+
+    });
+
+
+    if (error) {
+
+        alert("Erro: " + error.message);
+
+        return;
+
+    }
+
+
+    alert("Conta criada com sucesso!");
+
+    window.location.href = "login.html";
+
+});
+
+</script>
