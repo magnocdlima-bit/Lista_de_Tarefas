@@ -1,212 +1,347 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt_BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Tarefas</title>
-
-    <!-- Tailwind CSS v4 -->
+    <title>Lista de Tarefas</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Phosphor Icons -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
 
-<script src="supabase.js"></script>
-
-</head>
-
-<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
-
-    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 space-y-6">
-        
-        <!-- Header -->
-        <div class="flex items-center justify-between border-b border-slate-700 pb-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/30">
-                    <i class="ph-bold ph-list-checks text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-white tracking-wide">Minhas Tarefas</h1>
-                    <p class="text-xs text-slate-400">Organize seu dia com facilidade</p>
-                </div>
-            </div>
-            <span id="taskCounter" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300">
-                0 tarefas
-            </span>
-        </div>
-
-        <!-- Input Area -->
-        <div class="flex gap-2">
-            <div class="relative flex-1">
-                <input placeholder="Digite uma nova tarefa..." type="text" id="tarefa"
-                    class="w-full bg-slate-900/60 border border-slate-700 focus:border-indigo-500 text-slate-100 placeholder-slate-500 text-sm rounded-xl py-3 px-4 outline-none transition-all duration-200" />
-            </div>
-
-            <!-- Botão de Criar -->
-            <button id="criar" 
-                class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white p-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-indigo-600/25 cursor-pointer">
-                <i class="ph-bold ph-plus text-lg"></i>
-            </button>
-
-            <!-- Botão de Salvar Edição -->
-            <button id="confirmEdit" hidden 
-                class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white p-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-amber-600/25 cursor-pointer">
-                <i class="ph-bold ph-check text-lg"></i>
-            </button>
-        </div>
-
-        <!-- Lista de Tarefas -->
-        <div id="listaDeDados" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-            <!-- As tarefas serão inseridas aqui dinamicamente -->
-        </div>
-
-    </div>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4/dist/umd/supabase.min.js"></script>
+    <script src="assets/js/supabase.js"></script>
 
     <script>
-        let tarefas = [];
-        let idEditando = null;
+        async function testar() {
+            // console.log("=== INÍCIO DO TESTE ===");
+
+            const resultado = await supabaseClient
+                .from("users")
+                .select();
+
+            console.log("RESULTADO COMPLETO:", resultado);
+            console.log("DATA:", resultado.data);
+            console.log("QUANTIDADE:", resultado.data?.length);
+            console.log("ERROR:", resultado.error);       
+            console.log("=== FIM DO TESTE ===");
+            return resultado; // Retorna o resultado para uso posterior
+        }
+
+        testar();
+
+        const usuario = sessionStorage.getItem("email");
+        const userID = sessionStorage.getItem("userID");
+
+        if (!usuario) {
+            window.location.href = "login.html";
+        } else {
+            console.log("Usuário logado:", usuario);
+            console.log("ID do usuário:", userID);
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4/dist/umd/supabase.min.js"></script>
+
+    <style>
+        body {
+            background-image: url("./assets/wallpaper.jpg");
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body class="">
+
+    <nav class="relative bg-gray-800">
+        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+                <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                    <!-- Mobile menu button-->
+                    <button type="button" command="--toggle" commandfor="mobile-menu"
+                        class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500">
+                        <span class="absolute -inset-0.5"></span>
+                        <span class="sr-only">Open main menu</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon"
+                            aria-hidden="true" class="size-6 in-aria-expanded:hidden">
+                            <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon"
+                            aria-hidden="true" class="size-6 not-in-aria-expanded:hidden">
+                            <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                    <div class="flex shrink-0 items-center">
+                        <a href="appTaskList.html" class="flex items-center gap-2 text-white font-bold text-lg">
+                            Início
+                        </a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:block">
+                        <div class="flex space-x-4">
+                            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                    <a href="login.html"
+                        class="relative rounded-lg p-1 text-black bg-white p-2 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
+                        Login
+                    </a>
+
+                    <!-- Profile dropdown -->
+
+                </div>
+            </div>
+        </div>
+
+        <el-disclosure id="mobile-menu" hidden class="block sm:hidden">
+            <div class="space-y-1 px-2 pt-2 pb-3">
+                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
+
+            </div>
+        </el-disclosure>
+    </nav>
+    <!-- <div class="bg-[url(./assets/wallpaper.jpg)] "></div> -->
+    <br>
+
+    <div class="flex justify-center mt-5 w-80 mx-auto rounded-lg bg-black shadow-lg border-5 ">
+
+        <div
+            class="border border-gray-800 p-4 w-80 rounded-lg shadow-lg bg-gradient-to-r from-blue-500 via-blue-400  to-blue-500">
+            <div class="flex justify-center items-center ">
+                <i class="text-4xl ph-bold ph-list-checks"></i>
+            </div>
+            <h1 class="text-2xl text-center mt-2 font-bold text-black">
+                <div class="flex justify-center items-center gap-2">
+                    <span class="animate-bounce [animation-duration:3s]">Senai</span>
+                    <span class="animate-bounce [animation-duration:3.5s] text-blue-800">TaskList</span>
+
+                </div>
+            </h1>
+            <div class="flex flex-col mt-5 w-full justify-center items-center ">
+                <div class="flex gap-5">
+                    <div class="flex justify-between items-center gap-4">
+                        <input placeholder="Tarefa" type="text" name="tarefa" id="tarefa"
+                            class="placeholder-gray-800 focus:outline-none rounded-lg border-2 border-gray-800 text-black py-1 px-2">
+
+                        <button class="btn bg-blue-700 text-white py-2 px-3 rounded-full hover:bg-blue-900" id="criar">
+                            <i class="ph-bold ph-plus-circle"></i>
+                        </button>
+
+                        <button hidden class="btn bg-blue-700 text-white py-2 px-3 rounded-full hover:bg-blue-900"
+                            id="confirmEdit">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex justify-center ">
+        <div id="listaDeDados" class="flex flex-col gap-5 mt-5 w-80 justify-center items-center ">
+
+        </div>
+    </div>
+
+
+    <script>
+        var tarefas = []
+        let idTarefa = tarefas.length
 
         document.getElementById("criar").addEventListener("click", criarTarefa);
-        document.getElementById("confirmEdit").addEventListener("click", salvarEdicao);
-        
-        // Permite adicionar com a tecla Enter
-        document.getElementById("tarefa").addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                if (idEditando !== null) {
-                    salvarEdicao();
-                } else {
-                    criarTarefa();
-                }
+
+        async function criarTarefa() {
+            // let tarefa = document.getElementById("tarefa").value
+            // let idTarefa = tarefas.length
+
+            // if (tarefa == "") {
+            //     alert("Digite a tarefa!")
+            //     return
+            // }
+
+            // tarefas.push([idTarefa, tarefa, true])
+
+            // mostrarLista()
+            // document.getElementById("tarefa").value = ""
+
+            let tarefa = document.getElementById("tarefa").value
+
+            const { data, error } = await supabaseClient
+                .from('tasks')
+                .insert([
+                    { name: tarefa, id_user: sessionStorage.getItem("userID"), status: false }
+                ])
+
+            if (error) {
+                console.error('Erro ao criar tarefa:', error)
+            } else {
+                console.log('Tarefa criada com sucesso:', data)
             }
-        });
 
-        function criarTarefa() {
-            const input = document.getElementById("tarefa");
-            const texto = input.value.trim();
 
-            if (texto === "") {
-                alert("Digite a descrição da tarefa!");
-                return;
-            }
 
-            const idTarefa = Date.now(); // ID único baseado em timestamp
-            tarefas.push([idTarefa, texto, false]); // [id, texto, concluida]
-
-            mostrarLista();
-            input.value = "";
+            return
         }
 
         function mostrarLista() {
-            const listaDeDados = document.getElementById("listaDeDados");
-            const taskCounter = document.getElementById("taskCounter");
-            
-            listaDeDados.innerHTML = "";
-            taskCounter.textContent = `${tarefas.length} ${tarefas.length === 1 ? 'tarefa' : 'tarefas'}`;
+            let listaDeDados = document.getElementById("listaDeDados");
 
-            if (tarefas.length === 0) {
-                listaDeDados.innerHTML = `
-                    <div class="text-center py-8 text-slate-500 space-y-2">
-                        <i class="ph-bold ph-tray text-4xl opacity-50"></i>
-                        <p class="text-sm">Nenhuma tarefa encontrada.</p>
-                    </div>
-                `;
-                return;
-            }
+            listaDeDados.innerHTML = ``
 
             tarefas.forEach(function (tarefa) {
-                const [id, texto, concluida] = tarefa;
-                
-                const card = document.createElement("div");
-                card.className = `flex justify-between items-center p-3.5 rounded-xl border transition-all duration-200 ${
-                    concluida 
-                        ? 'bg-slate-900/40 border-slate-800 opacity-60' 
-                        : 'bg-slate-700/40 border-slate-700/60 hover:border-slate-600'
-                }`;
+                let icon = ''
+                if (tarefa[2] == true) {
+                    icon = `<i id="btnStatus${tarefa[0]}" class="ph-bold ph-check-circle btnStatus"></i>`
+                } else {
+                    icon = `<i id="btnStatus${tarefa[0]}" class="ph-bold ph-circle btnStatus"></i>`
+                }
 
-                card.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden mr-2">
-                        <button onclick="updateStatus(${id})" class="cursor-pointer text-lg ${concluida ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}">
-                            <i class="ph-bold ${concluida ? 'ph-check-circle' : 'ph-circle'}"></i>
-                        </button>
-                        <span class="text-sm font-medium ${concluida ? 'line-through text-slate-500' : 'text-slate-200'} truncate">
-                            ${texto}
+                listaDeDados.innerHTML += `
+                    <div  class="flex justify-between items-center w-80 border-5 p-2 border-gray-800 rounded-lg rounded-lg shadow-lg bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500">
+                        
+                        <span class="text-black font-bold px-3">
+                            ${tarefa[1]}
                         </span>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="iniciarEdicao(${id})" class="p-2 text-slate-400 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-                            <i class="ph-bold ph-pencil-simple text-base"></i>
-                        </button>
-                        <button onclick="deleteTarefa(${id})" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-                            <i class="ph-bold ph-trash text-base"></i>
-                        </button>
+                            
+                        <div class="flex gap-2">
+                            <button 
+                                id="btnStatus${tarefa[0]}"  
+                                class="btn bg-green-700 hover:bg-green-900 text-white p-2 rounded btnStatus">                             
+                                ${icon}
+                            </button>
+
+                            <button 
+                            id="btnEdit${tarefa[0]}"  
+                            class="btn bg-blue-700 hover:bg-blue-900 text-white p-2 rounded btnEdit">    
+                                <i id="btnEdit${tarefa[0]}" class="ph-bold ph-pencil-simple btnEdit"></i>
+                            </button>
+
+                            <button 
+                            id="btnDelete${tarefa[0]}"
+                            class="btn bg-red-700 hover:bg-red-900 text-white p-2 rounded btnDelete">    
+                                <i id="btnDelete${tarefa[0]}" class="ph-bold ph-trash btnDelete"></i>
+                            </button>
+                        </div>
+
                     </div>
                 `;
-
-                listaDeDados.appendChild(card);
             });
         }
 
-        function updateStatus(id) {
-            const index = tarefas.findIndex(t => t[0] === id);
-            if (index !== -1) {
-                tarefas[index][2] = !tarefas[index][2];
-                mostrarLista();
+        document.getElementById("listaDeDados").addEventListener("click", function (event) {
+
+            if (event.target.classList.contains("btnEdit")) {
+                edit(event.target);
             }
-        }
 
-        function iniciarEdicao(id) {
-            const tarefa = tarefas.find(t => t[0] === id);
-            if (!tarefa) return;
+        });
 
-            idEditando = id;
-            document.getElementById("tarefa").value = tarefa[1];
-            document.getElementById("tarefa").focus();
-            
-            document.getElementById("criar").setAttribute("hidden", "true");
-            document.getElementById("confirmEdit").removeAttribute("hidden");
-        }
+        function edit(elemento) {
+            const id = elemento.id
+            const idOnlyNumber = id.replace("btnEdit", '')
 
-        function salvarEdicao() {
-            const input = document.getElementById("tarefa");
-            const texto = input.value.trim();
+            const posicao = tarefas.findIndex(
+                item => item[0] === Number(idOnlyNumber)
+            );
 
-            if (texto === "") {
-                alert("Digite a tarefa!");
+            console.log(posicao, 'posicao')
+            if (posicao === -1) {
+                console.log("Tarefa não encontrada");
                 return;
             }
 
-            const index = tarefas.findIndex(t => t[0] === idEditando);
-            if (index !== -1) {
-                tarefas[index][1] = texto;
+            // console.log("tarefa Editada: " + tarefas[posicao][1]);
+
+            document.getElementById("tarefa").value = tarefas[posicao][1]
+
+            document.getElementById("confirmEdit").removeAttribute("hidden")
+
+            document.getElementById("btnDelete" + idOnlyNumber).setAttribute("hidden", true)
+
+            document.getElementById("criar").setAttribute("hidden", true)
+
+            document.getElementById("btnStatus" + idOnlyNumber).setAttribute("hidden", true)
+
+            document.getElementById("tarefa").setAttribute("idTarefaEdicao", posicao)
+        }
+
+        document.getElementById("confirmEdit").addEventListener("click", confirmEdit);
+
+        function confirmEdit() {
+            const idTarefa = document.getElementById("tarefa").getAttribute("idTarefaEdicao");
+
+            if (document.getElementById("tarefa").value == "") {
+                alert("Digite a tarefa!")
+                return
             }
 
-            // Restaura o estado inicial do formulário
-            idEditando = null;
-            input.value = "";
-            document.getElementById("confirmEdit").setAttribute("hidden", "true");
-            document.getElementById("criar").removeAttribute("hidden");
-            
+            tarefas[idTarefa][1] = document.getElementById("tarefa").value
+
+            document.getElementById("criar").removeAttribute("hidden")
+            document.getElementById("confirmEdit").setAttribute("hidden", true)
+
+            mostrarLista()
+            document.getElementById("tarefa").value = ""
+            return
+        }
+
+        document.getElementById("listaDeDados").addEventListener("click", function (event) {
+
+            if (event.target.classList.contains("btnStatus")) {
+                updateStatus(event.target);
+            }
+        });
+
+        function updateStatus(idTarefa) {
+            const id = idTarefa.id;
+            const idOnlyNumber = id.replace("btnStatus", "");
+
+            const posicao = tarefas.findIndex(
+                item => item[0] === Number(idOnlyNumber)
+            );
+
+            if (posicao === -1) {
+                console.log("Tarefa não encontrada");
+                return;
+            }
+
+            if (tarefas[posicao][2] === true) {
+                tarefas[posicao][2] = false;
+            } else {
+                tarefas[posicao][2] = true;
+            }
+
+
             mostrarLista();
         }
 
-        function deleteTarefa(id) {
-            tarefas = tarefas.filter(t => t[0] !== id);
-            
-            // Se estiver editando a tarefa que foi apagada, cancela a edição
-            if (idEditando === id) {
-                idEditando = null;
-                document.getElementById("tarefa").value = "";
-                document.getElementById("confirmEdit").setAttribute("hidden", "true");
-                document.getElementById("criar").removeAttribute("hidden");
+        document.getElementById("listaDeDados").addEventListener("click", function (event) {
+
+            if (event.target.classList.contains("btnDelete")) {
+                deleteTarefa(event.target);
             }
+
+        });
+
+        function deleteTarefa(idTarefa) {
+            const id = idTarefa.id;
+            const idOnlyNumber = parseInt(id.replace("btnDelete", ''));
+
+            console.log("deletar:", idOnlyNumber);
+
+            tarefas = tarefas.filter(tarefa => tarefa[0] !== idOnlyNumber);
+
+            console.log("task:", tarefas);
 
             mostrarLista();
         }
 
-        // Renderização inicial
-        mostrarLista();
     </script>
 
 </body>
