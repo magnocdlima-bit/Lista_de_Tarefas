@@ -369,7 +369,6 @@
             // } else {
             //     tarefas[posicao][2] = true;
             // }
-<<<<<<< HEAD:appTaskList.html
 
             if (element.getAttribute("status") === "true") {
                 element.setAttribute("status", "false");
@@ -385,14 +384,6 @@
                     .eq('id', idOnlyNumber)
             }
 
-=======
-
-            const tasks = await supabaseClient
-                .from("tasks")
-                .update({ name: document.getElementById("tarefa").value })
-                .eq('id', idTarefa)
-
->>>>>>> 7d3cc57a1260519a0bec93b4bbbe0c26ec792a9e:Aplicação_Lista_de_Tarefa.html
             mostrarLista();
         }
 
@@ -422,13 +413,7 @@
             mostrarLista();
         }
 
-
-
     </script>
-
-</body>
-
-</html>
 
 </body>
 
