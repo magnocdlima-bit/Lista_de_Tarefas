@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Conta</title>
+    <title>Login</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" type="text/css"
@@ -12,6 +12,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4/dist/umd/supabase.min.js"></script>
     <script src="assets/js/supabase.js"></script>
+<<<<<<< HEAD:register.html
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
 
@@ -21,6 +22,8 @@
 
 
 
+=======
+>>>>>>> 7d3cc57a1260519a0bec93b4bbbe0c26ec792a9e:Registre.html
 
 </head>
 
@@ -82,21 +85,12 @@
                 <i class=" text-4xl ph-bold ph-list-checks"></i>
             </div>
 
-            <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Crie sua conta
+            <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Entre em sua conta
             </h2>
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <div class="space-y-6">
-
-                <div>
-                    <label for="nome" class="block text-sm/6 font-medium text-gray-900">Nome</label>
-                    <div class="mt-2">
-                        <input id="nome" type="nome" name="nome" required autocomplete="nome"
-                            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                    </div>
-                </div>
-
+            <form action="#" method="POST" class="space-y-6">
                 <div>
                     <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
                     <div class="mt-2">
@@ -108,6 +102,7 @@
                 <div>
                     <div class="flex items-center justify-between">
                         <label for="password" class="block text-sm/6 font-medium text-gray-900">Senha</label>
+
                     </div>
                     <div class="mt-2">
                         <input id="password" type="password" name="password" required autocomplete="current-password"
@@ -116,19 +111,23 @@
                 </div>
 
                 <div>
-                    <button onclick="createUser()"
-                        class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Enviar
+                    <button type="submit" onclick="loginUser()"
+                        class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Entrar
                     </button>
                 </div>
+            </form>
+
+            <div>
+                <a href="register.html"
+                    class="flex mt-3 w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Criar
+                    Conta</a>
             </div>
 
         </div>
     </div>
 
     <script>
-
-        async function createUser() {
-            const nome = document.getElementById("nome").value;
+        async function loginUser() {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
             // const hashedPassword = bcrypt.hashSync(password, 10);
@@ -147,10 +146,10 @@
                 return;
             }
 
-            console.log("Nome:", nome);
             console.log("Email:", email);
             console.log("Senha:", password);
 
+<<<<<<< HEAD:register.html
             // Asynchronously hash a password
             bcrypt.hash(password, saltRounds, async function (err, hash) {
                 if (err) {
@@ -207,12 +206,35 @@
 
 
 
+=======
+            event.preventDefault();
 
-            // document.getElementById("myForm").submit();
+            const resultado = await supabaseClient
+                .from("users")
+                .select()
+                .eq('email', email)
+>>>>>>> 7d3cc57a1260519a0bec93b4bbbe0c26ec792a9e:Registre.html
+
+
+            if (resultado.data.length > 0 && resultado.data[0].password === password) {
+                console.log("Login bem-sucedido!");
+                sessionStorage.setItem("email", email);
+                sessionStorage.setItem("userID", resultado.data[0].id);
+                window.location.href = "appTaskList.html";
+            } else {
+                alert("Credenciais inválidas. Por favor, verifique seu email e senha.");
+                console.log("Credenciais inválidas.");
+            }
+
+            console.log("Resultado:", resultado);
 
         }
+<<<<<<< HEAD:register.html
         // console.log(SUPABASE_URL)
+=======
+>>>>>>> 7d3cc57a1260519a0bec93b4bbbe0c26ec792a9e:Registre.html
     </script>
+
 </body>
 
 </html>
